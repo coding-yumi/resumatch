@@ -55,7 +55,7 @@ export ZHIPU_API_KEY="your-zhipu-api-key"
 streamlit run app.py
 ```
 
-Open [http://localhost:8501](http://localhost:8501) in your browser.
+Open [http://localhost:8501](https://coding-yumi-resumatch.streamlit.app) in your browser.
 
 ---
 
