@@ -1,3 +1,4 @@
+import json
 import os
 
 import requests
@@ -30,13 +31,12 @@ def call_ai(prompt: str, system: str = "") -> str:
             API_URL,
             headers={
                 "Authorization": f"Bearer {api_key}",
-                "Content-Type": "application/json",
+                "Content-Type": "application/json; charset=utf-8",
             },
-            json={
-                "model": "glm-4-flash",
-                "messages": messages,
-                "temperature": 0.6,
-            },
+            data=json.dumps(
+                {"model": "glm-4-flash", "messages": messages, "temperature": 0.6},
+                ensure_ascii=False,
+            ).encode("utf-8"),
             timeout=60,
         )
         response.raise_for_status()
