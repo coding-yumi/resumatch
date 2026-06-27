@@ -29,14 +29,11 @@ def _parse_ai_json(text: str) -> tuple[dict | None, str]:
         return None, cleaned
 
 
-def _render_tags(label: str, items: list, color: str) -> None:
+def _render_tags(label: str, items: list) -> None:
     st.markdown(f"**{label}**")
     if items:
         tags_html = " ".join(
-            f'<span style="background:{color};color:#1a1a1a;padding:4px 12px;'
-            f'border-radius:16px;margin:3px 4px 3px 0;display:inline-block;'
-            f'font-size:0.9em">{item}</span>'
-            for item in items
+            f'<span class="apple-tag">{item}</span>' for item in items
         )
         st.markdown(tags_html, unsafe_allow_html=True)
     else:
@@ -51,30 +48,36 @@ def _render_analysis(result: dict) -> None:
     with col1:
         st.markdown(f"### {result.get('job_title', '未知岗位')}")
         company = result.get("company") or "未提及"
-        st.markdown(f"**公司：** {company}")
+        st.markdown(
+            f'<span style="color:#6E6E73;font-size:0.95rem;">{company}</span>',
+            unsafe_allow_html=True,
+        )
     with col2:
         direction = result.get("direction") or "未分类"
         st.markdown(
-            f'<p style="font-size:1.1em;margin-top:1.5em">'
-            f'<span style="background:#fff3cd;padding:6px 14px;border-radius:8px;'
-            f'font-weight:600">方向：{direction}</span></p>',
+            f'<span class="apple-tag" style="font-weight:600;font-size:0.9rem;'
+            f'margin-top:1.5em;">{direction}</span>',
             unsafe_allow_html=True,
         )
 
     summary = result.get("summary")
     if summary:
-        st.info(f"💡 {summary}")
+        st.info(summary)
 
-    _render_tags("硬技能", result.get("hard_skills", []), "#dbeafe")
-    _render_tags("软技能", result.get("soft_skills", []), "#dcfce7")
-    _render_tags("加分项", result.get("bonus_points", []), "#fce7f3")
+    _render_tags("硬技能", result.get("hard_skills", []))
+    _render_tags("软技能", result.get("soft_skills", []))
+    _render_tags("加分项", result.get("bonus_points", []))
 
     with st.expander("原始 JSON（调试）", expanded=False):
         st.json(result)
 
 
 st.title("JD 分析")
-st.markdown("粘贴完整职位描述，AI 将提取岗位关键要求，供后续经历匹配使用。")
+st.markdown(
+    '<p style="color:#6E6E73;font-size:1rem;margin-bottom:1.5rem;">'
+    '粘贴完整职位描述，AI 将提取岗位关键要求，供后续经历匹配使用。</p>',
+    unsafe_allow_html=True,
+)
 
 jd_text = st.text_area(
     "职位描述",
@@ -83,11 +86,15 @@ jd_text = st.text_area(
     label_visibility="collapsed",
 )
 
-if st.button("🔍 分析JD", type="primary"):
+col_btn, _ = st.columns([1, 4])
+with col_btn:
+    analyze_clicked = st.button("分析 JD", type="primary")
+
+if analyze_clicked:
     if not jd_text.strip():
         st.warning("请先粘贴职位描述后再分析。")
     else:
-        with st.spinner("AI分析中..."):
+        with st.spinner("AI 分析中..."):
             prompt = JD_ANALYSIS_USER.format(jd_text=jd_text.strip())
             response = call_ai(prompt, system=JD_ANALYSIS_SYSTEM)
 
@@ -100,9 +107,7 @@ if st.button("🔍 分析JD", type="primary"):
                 st.text(raw_text)
             else:
                 st.session_state.jd_analysis = parsed
-                st.success("✅ JD分析完成！请前往「匹配结果」页面查看推荐经历")
                 _render_analysis(parsed)
 
 elif st.session_state.jd_analysis:
-    st.success("✅ 已加载上次分析结果")
     _render_analysis(st.session_state.jd_analysis)

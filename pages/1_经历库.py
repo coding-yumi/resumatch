@@ -30,9 +30,14 @@ def _validate_date(value: str, field_name: str) -> str | None:
 
 
 st.title("经历库")
-st.markdown("录入并管理你的实习与项目经历，供后续 JD 匹配使用。")
+st.markdown(
+    '<p style="color:#6E6E73;font-size:1rem;margin-bottom:1.5rem;">'
+    '录入并管理你的实习与项目经历，供后续 JD 匹配使用。</p>',
+    unsafe_allow_html=True,
+)
 
-st.subheader("添加经历")
+# ── Add Experience Form ──
+st.markdown("### 添加经历")
 with st.form("add_experience_form", clear_on_submit=True):
     exp_type_label = st.selectbox("经历类型", list(TYPE_OPTIONS.keys()))
     title = st.text_input("职位 / 项目名称")
@@ -44,7 +49,7 @@ with st.form("add_experience_form", clear_on_submit=True):
     with col_end:
         end_date = st.text_input("结束时间", placeholder="2024-10 或 至今")
 
-    tags_input = st.text_input("技能标签", placeholder="Python,数据分析,SQL")
+    tags_input = st.text_input("技能标签", placeholder="Python, 数据分析, SQL")
     bullets_input = st.text_area(
         "经历要点",
         placeholder="每行一条，至少 3 条\n例如：\n负责用户行为数据分析\n搭建 SQL 报表看板\n优化查询性能 30%",
@@ -90,7 +95,9 @@ if submitted:
         st.success(f"已保存：{exp_dict['title']}（{TYPE_LABELS[exp_dict['type']]}）")
 
 st.divider()
-st.subheader("已有经历")
+
+# ── Existing Experiences ──
+st.markdown("### 已有经历")
 
 experiences = load_experiences()
 
@@ -100,7 +107,7 @@ else:
     for exp in reversed(experiences):
         type_label = TYPE_LABELS.get(exp.get("type", ""), exp.get("type", "未知"))
         period = f"{exp.get('start_date', '')} — {exp.get('end_date', '')}"
-        expander_title = f"{type_label} · {exp.get('title', '未命名')} · {period}"
+        expander_title = f"{type_label}  ·  {exp.get('title', '未命名')}  ·  {period}"
 
         with st.expander(expander_title, expanded=False):
             st.markdown(f"**公司 / 项目：** {exp.get('company_or_project', '-')}")
@@ -126,10 +133,10 @@ else:
                         else:
                             st.error("删除失败，请重试。")
                 with col_cancel:
-                    if st.button("取消", key=f"cancel_delete_{exp_id}"):
+                    if st.button("取消", key=f"cancel_delete_{exp_id}", type="secondary"):
                         st.session_state.pending_delete_id = None
                         st.rerun()
             else:
-                if st.button("删除", key=f"delete_{exp_id}"):
+                if st.button("删除", key=f"delete_{exp_id}", type="secondary"):
                     st.session_state.pending_delete_id = exp_id
                     st.rerun()

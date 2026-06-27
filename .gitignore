@@ -3,3 +3,5 @@ data/experiences.json
 __pycache__/
 *.pyc
 .env
+.workbuddy/
+.codebuddy/

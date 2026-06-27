@@ -77,33 +77,51 @@ def _render_match_card(result: dict) -> None:
     date_range = f"{exp.get('start_date', '')} — {exp.get('end_date', '')}"
     original_bullets = exp.get("bullets", [])
 
-    st.markdown(f"### {title} · {company}")
-    st.caption(f"📅 {date_range}")
-    st.progress(score / 100, text=f"匹配度 {score} 分")
-    st.markdown(f"**推荐理由：** {reason}")
+    # Header
+    st.markdown(f"### {title}")
+    st.markdown(
+        f'<p style="color:#6E6E73;font-size:0.92rem;margin-top:-0.5rem;">'
+        f'{company}  ·  {date_range}</p>',
+        unsafe_allow_html=True,
+    )
 
+    # Score
+    col_score, col_reason = st.columns([1, 3])
+    with col_score:
+        st.markdown(
+            f'<div class="score-display">{score}</div>'
+            f'<div class="score-label">匹配度</div>',
+            unsafe_allow_html=True,
+        )
+    with col_reason:
+        st.markdown(
+            f'<div style="padding-top:1rem;font-size:0.95rem;color:#6E6E73;'
+            f'line-height:1.6;">{reason}</div>',
+            unsafe_allow_html=True,
+        )
+
+    # Comparison: Original vs Rewritten
     col_left, col_right = st.columns(2)
 
     original_html = "".join(f"<li>{b}</li>" for b in original_bullets)
     with col_left:
         st.markdown(
-            f'<div style="background:#f5f5f5;padding:16px;border-radius:8px;min-height:200px">'
-            f"<strong>📄 原文</strong>"
-            f"<ul style='margin-top:8px;padding-left:20px'>{original_html}</ul>"
-            f"</div>",
+            f'<div class="compare-card original">'
+            f'<div class="compare-label">原文</div>'
+            f'<ul>{original_html}</ul>'
+            f'</div>',
             unsafe_allow_html=True,
         )
 
-    rewritten_display = "".join(f"<li>✨ {b}</li>" for b in rewritten)
+    rewritten_html = "".join(f"<li>{b}</li>" for b in rewritten)
     with col_right:
         st.markdown(
-            f'<div style="background:#e0f7fa;padding:16px;border-radius:8px;min-height:200px">'
-            f"<strong>✨ AI 改写</strong>"
-            f"<ul style='margin-top:8px;padding-left:20px'>{rewritten_display}</ul>"
-            f"</div>",
+            f'<div class="compare-card rewritten">'
+            f'<div class="compare-label">AI 改写</div>'
+            f'<ul>{rewritten_html}</ul>'
+            f'</div>',
             unsafe_allow_html=True,
         )
-        st.code("\n".join(rewritten), language=None)
 
     st.divider()
 
@@ -182,26 +200,30 @@ def _run_matching(jd_analysis: dict) -> None:
 
     progress_msg.empty()
     st.session_state.match_results = results
-    st.success(f"✅ 匹配完成！共推荐 {len(results)} 条经历。")
+    st.success(f"匹配完成，共推荐 {len(results)} 条经历。")
 
 
 st.title("匹配结果")
-st.markdown("根据 JD 分析结果，为你推荐最匹配的经历并生成优化版描述。")
+st.markdown(
+    '<p style="color:#6E6E73;font-size:1rem;margin-bottom:1.5rem;">'
+    '根据 JD 分析结果，为你推荐最匹配的经历并生成优化版描述。</p>',
+    unsafe_allow_html=True,
+)
 
 if not st.session_state.jd_analysis:
     st.warning("请先在「JD分析」页面输入 JD")
     st.stop()
 
 jd = st.session_state.jd_analysis
-st.subheader(f"🎯 {jd.get('job_title', '未知岗位')}")
+st.markdown(f"### {jd.get('job_title', '未知岗位')}")
 if jd.get("summary"):
     st.info(jd["summary"])
 
-if st.button("🚀 开始匹配与改写", type="primary"):
+if st.button("开始匹配与改写", type="primary"):
     _run_matching(jd)
 
 if st.session_state.match_results:
     st.markdown("---")
-    st.subheader("推荐经历与改写")
+    st.markdown("### 推荐经历与改写")
     for result in st.session_state.match_results:
         _render_match_card(result)
