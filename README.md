@@ -1,3 +1,4 @@
+<img width="1264" height="581" alt="image" src="https://github.com/user-attachments/assets/c5aa18ae-dc7f-42fa-a45a-5e9926b2b4f2" />
 # ResuMatch 🎯
 
 **AI-powered resume experience matcher & rewriter**
