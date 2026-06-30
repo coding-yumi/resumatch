@@ -1,135 +1,95 @@
-<img width="1264" height="581" alt="image" src="https://github.com/user-attachments/assets/c5aa18ae-dc7f-42fa-a45a-5e9926b2b4f2" />
-# ResuMatch 🎯
+# ResuMatch · AI 驱动的简历经历智能匹配与优化工具
 
-**AI-powered resume experience matcher & rewriter**
-
-**AI 驱动的简历经历匹配与优化工具**
-
-ResuMatch helps job seekers paste a job description (JD), automatically extract key requirements, match their existing experiences, and generate tailored resume bullet points — all in about 30 seconds.
-
-ResuMatch 帮助求职者粘贴岗位 JD，自动提取关键要求，匹配已有经历，并生成针对性的简历要点描述，全程约 30 秒完成。
+> 粘贴 JD，30 秒获得匹配该岗位的优化简历经历。
 
 ---
 
-## Features / 功能
+## 产品背景
 
-- **Experience Library** — Manage internship and project experiences  
-  **经历库** — 管理实习与项目经历
+投简历时我遇到一个持续困扰：同一段实习经历，投产品岗要强调「数据分析」和「跨部门协作」，投运营岗要突出「流程优化」和「落地执行」。每次手动筛选经历再逐条改写，耗时且质量不稳定。
 
-- **JD Analysis** — AI extracts skills, direction, and priorities from job posts  
-  **JD 分析** — AI 提取岗位技能、方向与核心要求
+所以我想：能不能让 AI 帮我做这件事？
 
-- **Smart Matching** — Score experiences against JD and rewrite top matches  
-  **智能匹配** — 对经历打分并改写 Top 推荐描述
+这个项目就是我对这个问题的回答——从发现问题，到定义「JD 解析 → 经历匹配 → 经历改写」三步流程，再到用 Vibe Coding 的方式把想法做成一个可用的 Web 工具。前后花了大约一周时间，大部分代码是跟 AI 结对完成的。
 
 ---
 
-## Local Setup / 本地运行
+## 核心功能
 
-### 1. Clone & install dependencies
+**经历库管理** — 结构化录入多段实习和项目经历，每条包含职位、公司、时间、技能标签和要点描述，作为后续匹配的素材池。
+
+**JD 智能解析** — 粘贴岗位描述，AI 自动提取岗位名称、方向、硬技能、软技能和加分项，生成结构化画像。
+
+**经历匹配评分** — AI 逐一评估每段经历与目标岗位的匹配度（0-100 分），按分数排序，输出 Top 3 推荐并附匹配理由。
+
+**经历智能改写** — 针对推荐的高分经历，AI 根据 JD 的关键词和技能偏好，将原始描述改写为更贴合岗位要求的版本。改写遵循 STAR 原则，严格保留原文中的数据事实，不编造内容。
+
+---
+
+## 产品截图
+
+| 主页 | 经历库 |
+|------|--------|
+| *（截图待补充 — 首页展示三步流程与经历概览）* | *（截图待补充 — 经历录入表单与卡片式列表）* |
+
+| JD 分析 | 匹配结果 |
+|---------|----------|
+| *（截图待补充 — JD 粘贴区与 AI 解析结果展示）* | *（截图待补充 — 评分排名、原文改写对比与导出功能）* |
+
+---
+
+## 我的思考
+
+### 为什么是 Web App 而不是浏览器插件或 Word 模板？
+
+做这个项目之前，我考虑过几种形态：浏览器插件可以在看 JD 时一键匹配，Word 模板适合手动调整。最终选了 Web App，主要因为三个考量：第一，JD 往往分散在多个招聘网站上，浏览器插件需要针对每个网站适配，维护成本高；第二，匹配和改写的过程需要展示对比结果、评分理由等结构化信息，一个完整的页面比弹窗更合适；第三，Web App 有链接就能用，不用安装，分享给朋友验证想法也方便——这对一个「想法验证阶段」的产品来说是更低的验证门槛。
+
+### Prompt 设计上的一些取舍
+
+做 JD 解析时，我最初让 AI 自由发挥输出自然语言描述，结果发现返回内容不可控——有时多写了岗位职责分析，有时漏掉了关键技能。后来改为要求输出纯 JSON，字段严格固定，解析成功率和可靠性提升明显。
+
+经历改写是我反复调整最多的部分。我加了一条硬约束——「不得捏造数据」——因为这是简历场景的底线。但同时这意味着虽然不同公司期间的数据可能不完全准确，但我宁愿接受改写后保留原文中保守的表述，让改写更真实。代价是改写后的表述可能不如完全放开约束那样「好看」，同时这可能也会体现在匹配的实际效果上。这个权衡在我看来是值得的。
+
+### 当前最大的局限
+
+这个产品目前的一个明显问题是匹配精度依赖单一的通用大模型进行判断，如果遇到模棱两可的 JD 或非标经历描述，评分偶尔会不稳定——同一段 JD 和经历跑两次可能得到 72 和 78 分的差异。对求职场景来说，5-10 分的波动可以接受，但如果分数从 85 掉到 60，用户体验就会很差。另外，目前只支持文本输入，不支持 PDF 简历解析，意味着用户需要手动拆解自己的简历内容再录入——这是使用摩擦最大的环节。
+
+### 如果继续迭代
+
+下一步我会优先做两件事。一是引入多轮评分机制——让 AI 先独立评分两次然后取均值，或者在评分后追加一轮「自检」让 AI 复核自己的判断依据——用少量的额外 Token 换取更高的评估稳定性。二是支持 PDF 上传，让用户直接扔简历文件就能自动提取经历，省去手动录入的成本。
+
+更长线的想法是引入岗位画像库和面试官视角——不单看 JD 文字匹配，还能基于不同公司文化、面试官偏好给出更精准的改写建议。但因为这种方式需要持续的数据积累，目前阶段暂不具备启动条件。
+
+---
+
+## 技术栈
+
+Python · Streamlit · 智谱 GLM API · Prompt Engineering
+
+---
+
+## 本地运行
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/coding-yumi/resumatch.git
 cd resumatch
 pip install -r requirements.txt
 ```
 
-### 2. Configure API Key
-
-Create `.streamlit/secrets.toml`:
+在 `.streamlit/secrets.toml` 中配置 API Key：
 
 ```toml
-ZHIPU_API_KEY = "your-zhipu-api-key"
+ZHIPU_API_KEY = "你的智谱 API Key"
 ```
 
-Get your key at [智谱开放平台](https://open.bigmodel.cn/).
-
-Alternatively, set the environment variable:
-
-```bash
-export ZHIPU_API_KEY="your-zhipu-api-key"
-```
-
-### 3. Run the app
+运行：
 
 ```bash
 streamlit run app.py
 ```
 
-Open [http://localhost:8501](https://coding-yumi-resumatch.streamlit.app) in your browser.
-
 ---
 
-## Deploy to Streamlit Cloud / 部署到 Streamlit Cloud
+## 在线体验
 
-1. Push the project to a **GitHub** repository  
-   将项目推送到 GitHub 仓库
-
-2. Go to [share.streamlit.io](https://share.streamlit.io/) and sign in with GitHub  
-   访问 Streamlit Cloud 并用 GitHub 登录
-
-3. Click **New app** → select your repo, branch, and main file `app.py`  
-   点击 **New app**，选择仓库、分支和入口文件 `app.py`
-
-4. Open **Advanced settings → Secrets** and add:
-
-   ```toml
-   ZHIPU_API_KEY = "your-zhipu-api-key"
-   ```
-
-5. Click **Deploy** — the app will be live in a few minutes  
-   点击 **Deploy**，数分钟后即可访问
-
-> **Note:** Do not commit real API keys. `.streamlit/secrets.toml` is listed in `.gitignore`.
-
----
-
-## Tech Highlights / 技术亮点
-
-1. **Multi-step AI pipeline with structured JSON output** — JD parsing, batch experience scoring, and per-item rewriting are orchestrated as separate prompt stages with fence-stripped JSON parsing and graceful fallbacks.  
-   **多阶段 AI 流水线 + 结构化 JSON 输出** — JD 解析、批量经历评分、逐条改写分步编排，含 JSON 容错解析与降级处理。
-
-2. **Session-state driven workflow across Streamlit multipage app** — `jd_analysis` and `match_results` persist across pages, enabling a seamless three-page user journey without a backend database.  
-   **Streamlit 多页面 + Session State 工作流** — 跨页面共享分析结果，无需后端数据库即可串联完整用户流程。
-
-3. **Modular prompt & data layer design** — Prompts, AI client, JSON data manager, and theme utilities are decoupled for easy iteration and interview-ready architecture discussion.  
-   **模块化 Prompt 与数据层设计** — Prompt 模板、API 封装、JSON 存储、主题样式解耦，便于迭代与架构讲解。
-
----
-
-## Project Structure / 项目结构
-
-```
-resumatch/
-├── app.py                 # Main entry & home page
-├── pages/
-│   ├── 1_经历库.py         # Experience library
-│   ├── 2_JD分析.py         # JD analysis
-│   └── 3_匹配结果.py       # Matching & rewriting
-├── utils/
-│   ├── ai_client.py       # Zhipu GLM API wrapper
-│   ├── data_manager.py    # JSON persistence
-│   ├── prompts.py         # Prompt templates
-│   └── theme.py           # Global CSS theme
-├── data/
-│   └── experiences.json
-├── .streamlit/
-│   └── secrets.toml
-└── requirements.txt
-```
-
----
-
-## Screenshots
-
-<!-- Add screenshots here after running the app -->
-
-| Home | JD Analysis | Match Results |
-|------|-------------|---------------|
-| _screenshot pending_ | _screenshot pending_ | _screenshot pending_ |
-
----
-
-## License
-
-MIT (or specify your license)
+🔗 [https://coding-yumi-resumatch.streamlit.app](https://coding-yumi-resumatch.streamlit.app)

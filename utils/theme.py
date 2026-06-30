@@ -231,6 +231,14 @@ GLOBAL_CSS = """
         background: #EDEBE8;
         border-right: 1px solid #E0DDD9;
     }
+    /* Collapsed sidebar: ensure toggle arrow is always visible */
+    section[data-testid="stSidebar"] [data-testid="stSidebarCollapseButton"] {
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+    section[data-testid="stSidebar"] .st-emotion-cache-1gwvycy {
+        opacity: 1 !important;
+    }
     section[data-testid="stSidebar"] .stMarkdown,
     section[data-testid="stSidebar"] div[data-testid="stMarkdownContainer"] p {
         color: #1A1A1A !important;
@@ -466,7 +474,7 @@ GLOBAL_CSS = """
     }
 
     /* ---------- Hide Streamlit default elements ---------- */
-    #MainMenu, footer, header[data-testid="stHeader"] {
+    #MainMenu, footer {
         display: none;
     }
     .stDeployButton {
@@ -474,6 +482,20 @@ GLOBAL_CSS = """
     }
     div[data-testid="stDecoration"] {
         display: none;
+    }
+
+    /* Keep header functional (sidebar toggle) but visually minimal */
+    header[data-testid="stHeader"] {
+        background: transparent !important;
+        backdrop-filter: none !important;
+    }
+    /* Hide the toolbar container within header */
+    header[data-testid="stHeader"] [data-testid="stToolbar"] {
+        display: none !important;
+    }
+    /* Hide the "Running" status pill */
+    header[data-testid="stHeader"] [data-testid="stAppStatus"] {
+        display: none !important;
     }
 </style>
 """
