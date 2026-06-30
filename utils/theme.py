@@ -3,104 +3,134 @@ import streamlit as st
 GLOBAL_CSS = """
 <style>
     /* ================================================================
-       ResuMatch — Apple Design Language
+       ResuMatch — Quiet Precision Design System
+       Inspired by Linear / Notion / Stripe
     ================================================================ */
 
-    /* ---------- Global Typography & Base ---------- */
+    /* ---------- Root & Base ---------- */
+    .stApp {
+        background: #F5F0EB;
+    }
     html, body, [class*="css"] {
-        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
-                     "PingFang SC", "Helvetica Neue", sans-serif;
-        color: #1D1D1F;
+        font-family: system-ui, -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+        color: #1A1A1A;
     }
-
     .block-container {
-        padding-top: 2.5rem;
-        padding-bottom: 4rem;
-        max-width: 1100px;
+        padding-top: 3rem;
+        padding-bottom: 5rem;
+        max-width: 960px;
     }
 
-    /* ---------- Hero (Homepage Banner Replacement) ---------- */
+    /* ---------- Typography ---------- */
+    h1 {
+        font-weight: 300 !important;
+        font-size: 2rem !important;
+        color: #1A1A1A !important;
+        letter-spacing: -0.01em !important;
+        padding: 0 !important;
+        margin-bottom: 0.25rem !important;
+    }
+    h2 {
+        font-weight: 400 !important;
+        font-size: 1.35rem !important;
+        color: #1A1A1A !important;
+        letter-spacing: -0.005em !important;
+    }
+    h3 {
+        font-weight: 400 !important;
+        font-size: 1.1rem !important;
+        color: #1A1A1A !important;
+    }
+    p, li {
+        line-height: 1.7;
+    }
+
+    /* ---------- Hero (Homepage) ---------- */
     .hero-container {
-        background: #FFFFFF;
-        padding: 4rem 2rem 3.5rem 2rem;
-        margin-bottom: 3rem;
-        text-align: center;
+        padding: 4rem 0 2rem 0;
+    }
+    .hero-logo {
+        font-size: 0.82rem;
+        font-weight: 500;
+        color: #6B6B6B;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 2.5rem;
     }
     .hero-title {
-        font-size: 48px;
-        font-weight: 600;
-        color: #1D1D1F !important;
-        margin: 0;
+        font-size: 52px;
+        font-weight: 300;
+        color: #1A1A1A !important;
+        margin: 0 0 1rem 0;
         letter-spacing: -0.02em;
-        line-height: 1.15;
+        line-height: 1.2;
     }
     .hero-subtitle {
         font-size: 18px;
-        color: #6E6E73;
-        margin: 12px 0 0 0;
+        color: #6B6B6B;
         font-weight: 400;
-        letter-spacing: 0;
+        margin: 0 0 3rem 0;
+        line-height: 1.6;
+    }
+    .hero-stat {
+        font-size: 2.2rem;
+        font-weight: 300;
+        color: #1A1A1A;
+        line-height: 1;
+    }
+    .hero-stat-label {
+        font-size: 0.78rem;
+        color: #6B6B6B;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-top: 0.3rem;
     }
 
-    /* ---------- Step Cards ---------- */
+    /* ---------- Step List ---------- */
+    .step-item {
+        padding: 1.5rem 0;
+        border-top: 1px solid #E0DDD9;
+    }
+    .step-num {
+        font-size: 0.78rem;
+        font-weight: 500;
+        color: #6B6B6B;
+        letter-spacing: 0.1em;
+        margin-bottom: 0.5rem;
+    }
+    .step-label {
+        font-size: 1.15rem;
+        font-weight: 400;
+        color: #1A1A1A;
+        margin-bottom: 0.35rem;
+    }
+    .step-desc {
+        font-size: 0.92rem;
+        color: #6B6B6B;
+        line-height: 1.6;
+    }
+
+    /* ---------- Cards ---------- */
     .resumatch-card {
         background: #FFFFFF;
-        border-radius: 16px;
-        padding: 32px 28px;
-        border: 1px solid #E5E5E5;
-        height: 100%;
-        transition: box-shadow 0.3s ease;
-    }
-    .resumatch-card:hover {
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    }
-    .resumatch-card .step-dot {
-        display: inline-block;
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: #0071E3;
-        margin-bottom: 16px;
-    }
-    .resumatch-card .step-num {
-        color: #0071E3;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        margin-bottom: 8px;
-    }
-    .resumatch-card .step-title {
-        color: #1D1D1F;
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin: 0 0 8px 0;
-    }
-    .resumatch-card .step-desc {
-        color: #6E6E73;
-        font-size: 0.92rem;
-        margin: 0;
-        line-height: 1.5;
+        border-radius: 8px;
+        padding: 28px 28px;
+        border: 1px solid #E0DDD9;
     }
 
     /* ---------- Form Card ---------- */
     .form-card {
         background: #FFFFFF;
-        border-radius: 16px;
+        border-radius: 8px;
         padding: 32px;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        border: 1px solid #E0DDD9;
         margin-bottom: 2rem;
     }
-
-    /* ---------- Page Titles ---------- */
-    h1 {
-        color: #1D1D1F !important;
-        font-weight: 600 !important;
-        font-size: 2rem !important;
-    }
-    h2, h3 {
-        color: #1D1D1F !important;
-        font-weight: 600 !important;
+    div[data-testid="stForm"] {
+        background: #FFFFFF;
+        border-radius: 8px;
+        padding: 2rem;
+        border: 1px solid #E0DDD9;
     }
 
     /* ---------- Input Fields: bottom-border style ---------- */
@@ -108,16 +138,16 @@ GLOBAL_CSS = """
     div[data-baseweb="input"] input:focus {
         border: none !important;
         border-radius: 0 !important;
-        border-bottom: 1px solid #E5E5E5 !important;
+        border-bottom: 1px solid #E0DDD9 !important;
         box-shadow: none !important;
         padding-left: 0 !important;
         padding-right: 0 !important;
-        font-size: 1rem !important;
-        color: #1D1D1F !important;
+        font-size: 0.95rem !important;
+        color: #1A1A1A !important;
         background: transparent !important;
     }
     div[data-baseweb="input"] input:focus {
-        border-bottom: 1px solid #0071E3 !important;
+        border-bottom: 1.5px solid #1A1A1A !important;
     }
     div[data-baseweb="input"] {
         background: transparent !important;
@@ -128,260 +158,322 @@ GLOBAL_CSS = """
     /* Textarea */
     textarea[data-testid="stTextAreaTextArea"] {
         background: #FFFFFF !important;
-        border: 1px solid #E5E5E5 !important;
-        border-radius: 12px !important;
+        border: 1px solid #E0DDD9 !important;
+        border-radius: 8px !important;
         padding: 16px !important;
-        font-size: 0.95rem !important;
-        color: #1D1D1F !important;
+        font-size: 0.92rem !important;
+        color: #1A1A1A !important;
+        line-height: 1.7 !important;
         resize: vertical !important;
     }
     textarea[data-testid="stTextAreaTextArea"]:focus {
-        border-color: #0071E3 !important;
-        box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.12) !important;
+        border-color: #1A1A1A !important;
+        box-shadow: none !important;
         outline: none !important;
+    }
+    textarea[data-testid="stTextAreaTextArea"]::placeholder {
+        color: #B0B0B0 !important;
     }
 
     /* Select box */
     div[data-baseweb="select"] {
         border: none !important;
-        border-bottom: 1px solid #E5E5E5 !important;
+        border-bottom: 1px solid #E0DDD9 !important;
         border-radius: 0 !important;
     }
     div[data-baseweb="select"]:focus-within {
-        border-bottom-color: #0071E3 !important;
+        border-bottom-color: #1A1A1A !important;
     }
 
-    /* ---------- Form Container ---------- */
-    div[data-testid="stForm"] {
-        background: #FFFFFF;
-        border-radius: 16px;
-        padding: 2rem;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-        border: none;
-    }
-
-    /* ---------- Buttons: Capsule Style ---------- */
+    /* ---------- Buttons ---------- */
     .stButton > button {
-        border-radius: 24px !important;
+        border-radius: 8px !important;
         font-weight: 500 !important;
-        border: none !important;
-        font-size: 0.95rem !important;
-        padding: 0.5rem 1.6rem !important;
+        border: 1px solid #E0DDD9 !important;
+        font-size: 0.9rem !important;
+        padding: 0.45rem 1.4rem !important;
         transition: all 0.2s ease !important;
+        letter-spacing: 0.01em !important;
     }
     .stButton > button[kind="primary"] {
-        background: #0071E3 !important;
+        background: #1A1A1A !important;
         color: #FFFFFF !important;
+        border-color: #1A1A1A !important;
     }
     .stButton > button[kind="primary"]:hover {
-        background: #0066CC !important;
+        background: #333333 !important;
+        border-color: #333333 !important;
     }
     .stButton > button[kind="secondary"] {
-        background: #F5F5F7 !important;
-        color: #1D1D1F !important;
+        background: #FFFFFF !important;
+        color: #1A1A1A !important;
     }
     .stButton > button[kind="secondary"]:hover {
-        background: #E5E5E5 !important;
+        background: #F5F0EB !important;
     }
-
-    /* Form submit button */
     button[data-testid="stFormSubmitButton"] {
-        background: #0071E3 !important;
+        background: #1A1A1A !important;
         color: #FFFFFF !important;
         border: none !important;
-        border-radius: 24px !important;
+        border-radius: 8px !important;
         font-weight: 500 !important;
-        font-size: 0.95rem !important;
-        padding: 0.5rem 1.6rem !important;
+        font-size: 0.9rem !important;
+        padding: 0.45rem 1.6rem !important;
         transition: all 0.2s ease !important;
+        letter-spacing: 0.01em !important;
     }
     button[data-testid="stFormSubmitButton"]:hover {
-        background: #0066CC !important;
+        background: #333333 !important;
     }
 
     /* ---------- Sidebar ---------- */
     section[data-testid="stSidebar"] {
-        background: #F5F5F7;
-        border-right: 1px solid #E5E5E5;
+        background: #EDEBE8;
+        border-right: 1px solid #E0DDD9;
     }
     section[data-testid="stSidebar"] .stMarkdown,
     section[data-testid="stSidebar"] div[data-testid="stMarkdownContainer"] p {
-        color: #1D1D1F !important;
-        font-size: 0.92rem;
+        color: #1A1A1A !important;
+        font-size: 0.88rem;
     }
     section[data-testid="stSidebar"] h1,
     section[data-testid="stSidebar"] h2,
     section[data-testid="stSidebar"] h3 {
-        color: #1D1D1F !important;
+        color: #1A1A1A !important;
     }
-    /* Sidebar nav links */
+    /* Sidebar nav links — clean text, selected gets 2px dark bar */
     section[data-testid="stSidebar"] a {
-        color: #1D1D1F !important;
+        color: #1A1A1A !important;
         text-decoration: none !important;
         display: block;
         padding: 0.5rem 0.75rem;
-        border-radius: 8px;
-        border-left: 3px solid transparent;
+        border-radius: 4px;
+        border-left: 2px solid transparent;
         transition: all 0.15s ease;
+        font-size: 0.88rem !important;
     }
     section[data-testid="stSidebar"] a:hover {
-        background: rgba(0, 113, 227, 0.06);
+        background: rgba(0, 0, 0, 0.04);
     }
-    /* Selected nav item — blue accent bar */
     section[data-testid="stSidebar"] a[aria-current="page"],
     section[data-testid="stSidebar"] a.st-emotion-cache-16ttjct {
-        border-left: 3px solid #0071E3 !important;
+        border-left: 2px solid #1A1A1A !important;
         font-weight: 500 !important;
     }
 
     /* ---------- Expanders ---------- */
     .streamlit-expanderHeader {
         background: #FFFFFF !important;
-        border: 1px solid #E5E5E5 !important;
-        border-radius: 12px !important;
+        border: 1px solid #E0DDD9 !important;
+        border-radius: 8px !important;
         font-weight: 500 !important;
-        color: #1D1D1F !important;
+        color: #1A1A1A !important;
     }
     details[data-testid="stExpander"] {
         background: transparent;
-        border-radius: 12px;
+        border-radius: 8px;
         border: none;
         overflow: hidden;
     }
 
     /* ---------- Alerts ---------- */
     div[data-baseweb="notification"] {
-        border-radius: 12px !important;
+        border-radius: 8px !important;
     }
     div[data-testid="stAlert"] {
-        border-radius: 12px !important;
-        border: none !important;
+        border-radius: 8px !important;
+        border: 1px solid #E0DDD9 !important;
+        background: #FFFFFF !important;
+    }
+    div[data-testid="stInfo"] {
+        background: #FFFFFF !important;
+        border-radius: 8px !important;
+        border: 1px solid #E0DDD9 !important;
+    }
+    div[data-testid="stWarning"] {
+        background: #FFFFFF !important;
+        border-radius: 8px !important;
+        border: 1px solid #E0DDD9 !important;
+        border-left: 3px solid #C4A24A !important;
+    }
+    div[data-testid="stSuccess"] {
+        background: #FFFFFF !important;
+        border-radius: 8px !important;
+        border: 1px solid #E0DDD9 !important;
+    }
+    div[data-testid="stError"] {
+        background: #FFFFFF !important;
+        border-radius: 8px !important;
+        border: 1px solid #E0DDD9 !important;
     }
 
     /* ---------- Dividers ---------- */
     hr {
-        border-color: #E5E5E5 !important;
-        margin: 2rem 0 !important;
+        border-color: #E0DDD9 !important;
+        margin: 2.5rem 0 !important;
+        border-width: 0.5px !important;
     }
 
     /* ---------- Score Display ---------- */
     .score-display {
-        font-size: 48px;
-        font-weight: 700;
-        color: #0071E3;
+        font-size: 64px;
+        font-weight: 200;
+        color: #1A1A1A;
         line-height: 1;
-        margin: 0.5rem 0;
+        margin: 0;
     }
-    .score-label {
-        font-size: 14px;
-        color: #6E6E73;
-        margin-top: 4px;
+    .score-unit {
+        font-size: 18px;
+        font-weight: 300;
+        color: #6B6B6B;
+        margin-left: 2px;
     }
 
-    /* ---------- Comparison Cards ---------- */
-    .compare-card {
+    /* ---------- Comparison: Vertical Layout ---------- */
+    .compare-original {
+        background: #FAFAF8;
+        border-radius: 8px;
+        padding: 24px 28px;
+        border: 1px solid #E0DDD9;
+        margin-bottom: 0;
+    }
+    .compare-rewritten {
         background: #FFFFFF;
-        border-radius: 16px;
-        padding: 24px;
-        border: 1px solid #E5E5E5;
-        min-height: 220px;
+        border-radius: 8px;
+        padding: 24px 28px;
+        border: 1px solid #E0DDD9;
+        margin-top: 0;
     }
-    .compare-card.original {
-        background: #FAFAFA;
-    }
-    .compare-card.rewritten {
-        border-left: 3px solid #0071E3;
-    }
-    .compare-card .compare-label {
-        font-size: 0.82rem;
-        font-weight: 600;
-        color: #6E6E73;
+    .compare-label {
+        font-size: 0.72rem;
+        font-weight: 500;
+        color: #6B6B6B;
+        letter-spacing: 0.1em;
         text-transform: uppercase;
-        letter-spacing: 0.06em;
         margin-bottom: 16px;
     }
-    .compare-card ul {
+    .compare-list {
         list-style: none;
         padding: 0;
         margin: 0;
     }
-    .compare-card ul li {
-        color: #1D1D1F;
-        font-size: 0.93rem;
+    .compare-list li {
+        color: #1A1A1A;
+        font-size: 0.92rem;
         line-height: 1.7;
-        padding: 4px 0;
-        padding-left: 16px;
+        padding: 4px 0 4px 14px;
         position: relative;
     }
-    .compare-card ul li::before {
+    .compare-list li::before {
         content: "";
         position: absolute;
         left: 0;
-        top: 12px;
-        width: 6px;
-        height: 6px;
+        top: 11px;
+        width: 5px;
+        height: 5px;
         border-radius: 50%;
-        background: #D1D1D6;
-    }
-    .compare-card.rewritten ul li::before {
-        background: #0071E3;
+        background: #D1CFCC;
     }
 
     /* ---------- Tags ---------- */
-    .apple-tag {
+    .tag {
         display: inline-block;
-        background: #F5F5F7;
-        color: #1D1D1F;
-        padding: 4px 12px;
-        border-radius: 16px;
-        font-size: 0.85rem;
+        background: #FFFFFF;
+        color: #1A1A1A;
+        padding: 3px 10px;
+        border-radius: 6px;
+        font-size: 0.8rem;
         margin: 3px 6px 3px 0;
+        border: 1px solid #E0DDD9;
+        letter-spacing: 0.02em;
     }
 
-    /* ---------- Tech Stack Footer ---------- */
-    .tech-stack {
-        text-align: center;
-        margin-top: 3rem;
-        padding-top: 2rem;
-        border-top: 1px solid #E5E5E5;
+    /* ---------- Experience Card ---------- */
+    .exp-card {
+        background: #FFFFFF;
+        border-radius: 8px;
+        padding: 24px 28px;
+        border: 1px solid #E0DDD9;
+        margin-bottom: 1rem;
     }
-    .tech-tag {
-        display: inline-block;
-        color: #6E6E73;
+    .exp-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 0.75rem;
+    }
+    .exp-card-title {
+        font-size: 1.05rem;
+        font-weight: 500;
+        color: #1A1A1A;
+    }
+    .exp-card-meta {
         font-size: 0.85rem;
-        margin: 0.25rem 0.35rem;
+        color: #6B6B6B;
     }
-    .tech-separator {
-        color: #D1D1D6;
-        margin: 0 0.25rem;
+    .exp-card-bullet {
+        font-size: 0.9rem;
+        color: #4A4A4A;
+        line-height: 1.65;
+        padding: 2px 0;
     }
 
-    /* ---------- Spinner ---------- */
+    /* ---------- Match Section Divider ---------- */
+    .match-divider {
+        border: none;
+        border-top: 1px solid #E0DDD9;
+        margin: 20px 0;
+    }
+
+    /* ---------- Progress / Spinner ---------- */
     div[data-testid="stSpinner"] {
-        color: #0071E3 !important;
+        color: #1A1A1A !important;
     }
 
-    /* ---------- Progress bar → hide (replaced by score number) ---------- */
+    /* ---------- Progress bar → hide ---------- */
     div[data-testid="stProgressBar"] {
         display: none;
     }
 
-    /* ---------- Info boxes ---------- */
-    div[data-testid="stInfo"] {
-        background: #F5F5F7 !important;
-        border-radius: 12px !important;
+    /* ---------- Multi-select tags ---------- */
+    div[data-baseweb="tag"] {
+        border-radius: 6px !important;
+        background: #FFFFFF !important;
+        border: 1px solid #E0DDD9 !important;
     }
 
-    /* ---------- Warning boxes ---------- */
-    div[data-testid="stWarning"] {
-        background: #FFF9F0 !important;
-        border-radius: 12px !important;
+    /* ---------- Metric boxes ---------- */
+    div[data-testid="stMetric"] {
+        background: transparent !important;
+        padding: 0 !important;
+    }
+    div[data-testid="stMetric"] label {
+        font-size: 0.75rem !important;
+        font-weight: 500 !important;
+        color: #6B6B6B !important;
+        letter-spacing: 0.1em !important;
+        text-transform: uppercase !important;
+    }
+    div[data-testid="stMetricValue"] {
+        font-size: 2rem !important;
+        font-weight: 300 !important;
+        color: #1A1A1A !important;
     }
 
-    /* ---------- Success boxes ---------- */
-    div[data-testid="stSuccess"] {
-        background: #F0FFF4 !important;
-        border-radius: 12px !important;
+    /* ---------- Tooltip ---------- */
+    div[data-testid="stTooltipHoverTarget"] {
+        border-bottom: 1px dotted #6B6B6B !important;
+    }
+
+    /* ---------- Hide Streamlit default elements ---------- */
+    #MainMenu, footer, header[data-testid="stHeader"] {
+        display: none;
+    }
+    .stDeployButton {
+        display: none;
+    }
+    div[data-testid="stDecoration"] {
+        display: none;
     }
 </style>
 """

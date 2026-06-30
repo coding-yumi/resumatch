@@ -1,9 +1,9 @@
 import json
-import re
 
 import streamlit as st
 
 from utils.ai_client import call_ai
+from utils.helpers import parse_ai_json
 from utils.prompts import JD_ANALYSIS_SYSTEM, JD_ANALYSIS_USER
 from utils.theme import inject_global_css
 
@@ -11,86 +11,63 @@ inject_global_css()
 
 if "jd_analysis" not in st.session_state:
     st.session_state.jd_analysis = None
-
-
-def _strip_json_fence(text: str) -> str:
-    cleaned = text.strip()
-    if cleaned.startswith("```"):
-        cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned, flags=re.IGNORECASE)
-        cleaned = re.sub(r"\s*```$", "", cleaned)
-    return cleaned.strip()
-
-
-def _parse_ai_json(text: str) -> tuple[dict | None, str]:
-    cleaned = _strip_json_fence(text)
-    try:
-        return json.loads(cleaned), cleaned
-    except json.JSONDecodeError:
-        return None, cleaned
+if "jd_analysis_raw" not in st.session_state:
+    st.session_state.jd_analysis_raw = None
 
 
 def _render_tags(label: str, items: list) -> None:
-    st.markdown(f"**{label}**")
-    if items:
-        tags_html = " ".join(
-            f'<span class="apple-tag">{item}</span>' for item in items
-        )
-        st.markdown(tags_html, unsafe_allow_html=True)
-    else:
-        st.caption("暂无")
+    if not items:
+        return
+    tags_html = " ".join(f'<span class="tag">{item}</span>' for item in items)
+    st.markdown(
+        f'<p style="font-size:0.82rem;font-weight:500;color:#6B6B6B;'
+        f'margin-bottom:0.5rem;">{label}</p>'
+        f'<div style="margin-bottom:1rem;">{tags_html}</div>',
+        unsafe_allow_html=True,
+    )
 
 
 def _render_analysis(result: dict) -> None:
-    st.markdown("---")
-    st.subheader("分析结果")
+    job_title = result.get("job_title", "未知岗位")
+    company = result.get("company") or "未提及公司"
+    direction = result.get("direction") or "未分类"
+    summary = result.get("summary", "")
 
-    col1, col2 = st.columns(2)
-    with col1:
-        st.markdown(f"### {result.get('job_title', '未知岗位')}")
-        company = result.get("company") or "未提及"
-        st.markdown(
-            f'<span style="color:#6E6E73;font-size:0.95rem;">{company}</span>',
-            unsafe_allow_html=True,
-        )
-    with col2:
-        direction = result.get("direction") or "未分类"
-        st.markdown(
-            f'<span class="apple-tag" style="font-weight:600;font-size:0.9rem;'
-            f'margin-top:1.5em;">{direction}</span>',
-            unsafe_allow_html=True,
-        )
+    st.markdown(
+        f'<h2 style="margin-top:2rem;">{job_title}</h2>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        f'<p style="color:#6B6B6B;font-size:0.95rem;margin-top:-0.5rem;">'
+        f'{company}  ·  {direction}</p>',
+        unsafe_allow_html=True,
+    )
 
-    summary = result.get("summary")
     if summary:
-        st.info(summary)
+        st.markdown(
+            f'<div style="background:#FFFFFF;border:1px solid #E0DDD9;'
+            f'border-radius:8px;padding:20px 24px;margin:1.5rem 0;'
+            f'font-size:0.92rem;color:#4A4A4A;line-height:1.7;">'
+            f'{summary}</div>',
+            unsafe_allow_html=True,
+        )
 
-    _render_tags("硬技能", result.get("hard_skills", []))
-    _render_tags("软技能", result.get("soft_skills", []))
-    _render_tags("加分项", result.get("bonus_points", []))
-
-    with st.expander("原始 JSON（调试）", expanded=False):
-        st.json(result)
+    _render_tags("HARD SKILLS", result.get("hard_skills", []))
+    _render_tags("SOFT SKILLS", result.get("soft_skills", []))
+    _render_tags("BONUS", result.get("bonus_points", []))
 
 
-st.title("JD 分析")
-st.markdown(
-    '<p style="color:#6E6E73;font-size:1rem;margin-bottom:1.5rem;">'
-    '粘贴完整职位描述，AI 将提取岗位关键要求，供后续经历匹配使用。</p>',
-    unsafe_allow_html=True,
-)
+# ── Page ──────────────────────────────────────────────────────────
+st.markdown('<h1 style="margin-top:0;">JD 分析</h1>', unsafe_allow_html=True)
 
 jd_text = st.text_area(
     "职位描述",
-    placeholder="请粘贴招聘岗位描述...",
-    height=280,
+    placeholder="粘贴完整职位描述，AI 将提取关键信息...",
+    height=300,
     label_visibility="collapsed",
 )
 
-col_btn, _ = st.columns([1, 4])
-with col_btn:
-    analyze_clicked = st.button("分析 JD", type="primary")
-
-if analyze_clicked:
+if st.button("分析 JD", type="primary"):
     if not jd_text.strip():
         st.warning("请先粘贴职位描述后再分析。")
     else:
@@ -101,13 +78,45 @@ if analyze_clicked:
         if not response:
             st.error("AI 未返回有效结果，请检查 API Key 或稍后重试。")
         else:
-            parsed, raw_text = _parse_ai_json(response)
+            parsed, raw_text = parse_ai_json(response)
             if parsed is None:
                 st.error("JSON 解析失败，以下为 AI 原始返回：")
                 st.text(raw_text)
             else:
                 st.session_state.jd_analysis = parsed
+                st.session_state.jd_analysis_raw = raw_text
+                # Store raw JD text for history
+                if "jd_history" not in st.session_state:
+                    st.session_state.jd_history = []
+                # Avoid duplicates
+                existing = [h for h in st.session_state.jd_history if h["jd"] == jd_text.strip()]
+                if not existing:
+                    st.session_state.jd_history.insert(0, {
+                        "jd": jd_text.strip()[:200],
+                        "job_title": parsed.get("job_title", ""),
+                        "company": parsed.get("company", ""),
+                        "result": parsed,
+                        "timestamp": json.dumps({"date": ""}),  # placeholder
+                    })
+                    if len(st.session_state.jd_history) > 10:
+                        st.session_state.jd_history = st.session_state.jd_history[:10]
                 _render_analysis(parsed)
+                st.rerun()
 
 elif st.session_state.jd_analysis:
     _render_analysis(st.session_state.jd_analysis)
+
+# ── JD History ────────────────────────────────────────────────────
+if "jd_history" in st.session_state and len(st.session_state.jd_history) > 1:
+    st.markdown('<div style="height:2rem;"></div>', unsafe_allow_html=True)
+    st.markdown(
+        '<p style="font-size:0.8rem;font-weight:500;color:#6B6B6B;'
+        'letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.5rem;">'
+        'Recent JDs</p>',
+        unsafe_allow_html=True,
+    )
+    for i, h in enumerate(st.session_state.jd_history[1:8]):
+        label = f"{h.get('job_title', 'JD')} — {h.get('company', '')}"[:50]
+        if st.button(label, key=f"jd_hist_{i}"):
+            st.session_state.jd_analysis = h["result"]
+            st.rerun()

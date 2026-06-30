@@ -5,91 +5,62 @@ from utils.theme import inject_global_css
 
 st.set_page_config(
     page_title="ResuMatch",
-    page_icon="🎯",
+    page_icon="◾",
     layout="wide",
 )
 
 inject_global_css()
 
-if not load_experiences():
-    st.info("请先前往「经历库」页面添加你的实习和项目经历。")
+experiences = load_experiences()
+exp_count = len(experiences)
 
+# ── Hero ──────────────────────────────────────────────────────────
 st.markdown(
     """
     <div class="hero-container">
-        <h1 class="hero-title">ResuMatch</h1>
-        <p class="hero-subtitle">智能简历经历优化工具</p>
+        <div class="hero-logo">ResuMatch</div>
+        <h1 class="hero-title">简历，匹配你真正的价值</h1>
+        <p class="hero-subtitle">
+            录入经历，解析 JD，AI 为你精准匹配并优化描述
+        </p>
     </div>
     """,
     unsafe_allow_html=True,
 )
 
-st.markdown(
-    '<p style="text-align:center;font-size:1.2rem;font-weight:600;'
-    'color:#1D1D1F;margin-bottom:2.5rem;">'
-    '三步完成简历经历优化</p>',
-    unsafe_allow_html=True,
-)
-
-col1, col2, col3 = st.columns(3)
-
-with col1:
+# ── Stats ─────────────────────────────────────────────────────────
+if exp_count > 0:
+    col_s1, col_s2 = st.columns(2)
+    with col_s1:
+        st.markdown(f'<div class="hero-stat">{exp_count}</div>', unsafe_allow_html=True)
+        st.markdown('<div class="hero-stat-label">Experiences</div>', unsafe_allow_html=True)
+    with col_s2:
+        st.markdown('<div class="hero-stat">3</div>', unsafe_allow_html=True)
+        st.markdown('<div class="hero-stat-label">Steps</div>', unsafe_allow_html=True)
+    st.markdown('<div style="height:2.5rem;"></div>', unsafe_allow_html=True)
+else:
     st.markdown(
-        """
-        <div class="resumatch-card">
-            <div class="step-dot"></div>
-            <div class="step-num">Step 1</div>
-            <p class="step-title">录入经历库</p>
-            <p class="step-desc">
-                添加实习与项目经历，沉淀你的求职素材
-            </p>
+        '<p style="color:#6B6B6B;font-size:0.9rem;margin-bottom:2rem;">'
+        '请先前往「经历库」页面添加你的实习和项目经历。</p>',
+        unsafe_allow_html=True,
+    )
+    st.markdown('<div style="height:1rem;"></div>', unsafe_allow_html=True)
+
+# ── Steps ─────────────────────────────────────────────────────────
+steps = [
+    ("01", "录入经历库", "添加实习与项目经历，沉淀你的求职素材"),
+    ("02", "粘贴岗位 JD", "AI 自动提取岗位要求、技能标签与核心能力"),
+    ("03", "获取匹配结果", "智能匹配 Top 经历，生成 JD 对口的优化描述"),
+]
+
+for num, label, desc in steps:
+    st.markdown(
+        f"""
+        <div class="step-item">
+            <div class="step-num">{num}</div>
+            <div class="step-label">{label}</div>
+            <div class="step-desc">{desc}</div>
         </div>
         """,
         unsafe_allow_html=True,
     )
-
-with col2:
-    st.markdown(
-        """
-        <div class="resumatch-card">
-            <div class="step-dot"></div>
-            <div class="step-num">Step 2</div>
-            <p class="step-title">粘贴岗位 JD</p>
-            <p class="step-desc">
-                AI 自动提取岗位技能要求与核心能力
-            </p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-with col3:
-    st.markdown(
-        """
-        <div class="resumatch-card">
-            <div class="step-dot"></div>
-            <div class="step-num">Step 3</div>
-            <p class="step-title">获取匹配结果</p>
-            <p class="step-desc">
-                智能匹配 Top 经历，一键生成优化描述
-            </p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-st.markdown(
-    """
-    <div class="tech-stack">
-        <span class="tech-tag">Python</span>
-        <span class="tech-separator">·</span>
-        <span class="tech-tag">Streamlit</span>
-        <span class="tech-separator">·</span>
-        <span class="tech-tag">智谱 GLM API</span>
-        <span class="tech-separator">·</span>
-        <span class="tech-tag">Prompt Engineering</span>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
