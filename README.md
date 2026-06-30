@@ -27,16 +27,10 @@
 ---
 
 ## 产品截图
+<img width="1218" height="585" alt="image" src="https://github.com/user-attachments/assets/51d03f59-0d91-48a4-bd65-50f91d3ed8d8" />
+<img width="1228" height="596" alt="image" src="https://github.com/user-attachments/assets/172185f6-1f9e-421c-8839-0d9ee7b12582" />
 
-| 主页 | 经历库 |
-|------|--------|
-| *（截图待补充 — 首页展示三步流程与经历概览）* | *（截图待补充 — 经历录入表单与卡片式列表）* |
 
-| JD 分析 | 匹配结果 |
-|---------|----------|
-| *（截图待补充 — JD 粘贴区与 AI 解析结果展示）* | *（截图待补充 — 评分排名、原文改写对比与导出功能）* |
-
----
 
 ## 我的思考
 
