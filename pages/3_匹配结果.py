@@ -4,8 +4,10 @@ import streamlit as st
 
 from utils.ai_client import call_ai
 from utils.data_manager import load_experiences
-from utils.helpers import parse_json_array, parse_rewrite_lines, strip_json_fence
+from utils.helpers import parse_json_array, parse_rewrite_lines
 from utils.prompts import (
+    ASSET_PARSE_SYSTEM,
+    ASSET_PARSE_USER,
     MATCH_SCORING_SYSTEM,
     MATCH_SCORING_USER,
     REWRITE_SYSTEM,
@@ -31,12 +33,18 @@ def _format_experiences_for_prompt(experiences: list) -> str:
             "type": exp.get("type"),
             "title": exp.get("title"),
             "company_or_project": exp.get("company_or_project"),
-            "start_date": exp.get("start_date"),
-            "end_date": exp.get("end_date"),
-            "tags": exp.get("tags", []),
-            "bullets": exp.get("bullets", []),
+            "story": exp.get("story", ""),
         })
     return json.dumps(slim, ensure_ascii=False, indent=2)
+
+
+def _parse_asset_json(text: str) -> dict:
+    """Parse AI asset extraction response, fallback gracefully."""
+    from utils.helpers import parse_ai_json as _p
+    parsed, _ = _p(text)
+    if parsed is None:
+        return {"actions": [], "results": [], "abilities": [], "flex_keywords": {}}
+    return parsed
 
 
 def _render_match_card(result: dict) -> None:
@@ -44,10 +52,9 @@ def _render_match_card(result: dict) -> None:
     score = result["score"]
     reason = result["reason"]
     rewritten = result.get("rewritten", [])
-    original_bullets = exp.get("bullets", [])
+    story_text = exp.get("story", "")
     title = exp.get("title", "未命名")
     company = exp.get("company_or_project", "-")
-    date_range = f"{exp.get('start_date', '')} — {exp.get('end_date', '')}"
 
     st.markdown('<div style="height:1.5rem;"></div>', unsafe_allow_html=True)
 
@@ -56,7 +63,7 @@ def _render_match_card(result: dict) -> None:
         f'<div style="display:flex;justify-content:space-between;align-items:baseline;'
         f'margin-bottom:0.5rem;">'
         f'<span style="font-size:1.1rem;font-weight:500;color:#1A1A1A;">{title}</span>'
-        f'<span style="font-size:0.85rem;color:#6B6B6B;">{company}  ·  {date_range}</span>'
+        f'<span style="font-size:0.85rem;color:#6B6B6B;">{company}</span>'
         f'</div>',
         unsafe_allow_html=True,
     )
@@ -77,21 +84,25 @@ def _render_match_card(result: dict) -> None:
         unsafe_allow_html=True,
     )
 
-    # Original bullets
+    # Original story (truncated)
+    story_preview = story_text[:300] + ("..." if len(story_text) > 300 else "")
     st.markdown(
         '<div class="compare-original">'
-        '<div class="compare-label">Original</div>'
-        '<ul class="compare-list">'
-        + "".join(f"<li>{b}</li>" for b in original_bullets) +
-        '</ul></div>',
+        '<div class="compare-label">Original Story</div>'
+        f'<p style="font-size:0.9rem;color:#4A4A4A;line-height:1.7;white-space:pre-wrap;">{story_preview}</p>'
+        '</div>',
         unsafe_allow_html=True,
     )
 
-    # Divider between original and rewritten
+    # Divider
     st.markdown('<div class="match-divider"></div>', unsafe_allow_html=True)
 
     # Rewritten bullets
-    rewritten_list_html = "".join(f"<li>{b}</li>" for b in rewritten) if rewritten else "<li>改写中...</li>"
+    rewritten_list_html = (
+        "".join(f"<li>{b}</li>" for b in rewritten)
+        if rewritten
+        else "<li>改写中...</li>"
+    )
     st.markdown(
         '<div class="compare-rewritten">'
         '<div class="compare-label">AI Optimized</div>'
@@ -115,7 +126,7 @@ def _render_match_card(result: dict) -> None:
 def _run_matching(jd_analysis: dict) -> None:
     experiences = load_experiences()
     if not experiences:
-        st.warning("经历库为空，请先在「经历库」页面添加经历。")
+        st.warning("职业资产库为空，请先在「Career Asset Library」页面添加经历故事。")
         return
 
     # Step 1: Scoring
@@ -149,28 +160,35 @@ def _run_matching(jd_analysis: dict) -> None:
         st.session_state.match_results = []
         return
 
-    direction = jd_analysis.get("direction", "")
-    hard_skills = "、".join(jd_analysis.get("hard_skills", []))
-    soft_skills = "、".join(jd_analysis.get("soft_skills", []))
+    jd_summary = json.dumps(jd_analysis, ensure_ascii=False, indent=2)
 
-    # Step 2: Rewrite each top match
+    # Step 2: Two-step rewrite for each top match
     results = []
     total = len(top_matches)
     progress_container = st.empty()
 
     for idx, match in enumerate(top_matches, start=1):
         exp = exp_map[match["id"]]
+        story = exp.get("story", "")
         progress_container.info(f"正在改写第 {idx} / {total} 条经历...")
 
-        date_range = f"{exp.get('start_date', '')} — {exp.get('end_date', '')}"
+        # Step 2a: Parse career assets from story (internal)
+        asset_prompt = ASSET_PARSE_USER.format(story=story)
+        asset_response = call_ai(asset_prompt, system=ASSET_PARSE_SYSTEM)
+        assets = _parse_asset_json(asset_response) if asset_response else {}
+        actions = json.dumps(assets.get("actions", []), ensure_ascii=False)
+        results_str = json.dumps(assets.get("results", []), ensure_ascii=False)
+        abilities = json.dumps(assets.get("abilities", []), ensure_ascii=False)
+        flex_keywords = json.dumps(assets.get("flex_keywords", {}), ensure_ascii=False)
+
+        # Step 2b: Generate optimized bullets using assets + JD
         rewrite_prompt = REWRITE_USER.format(
-            direction=direction,
-            hard_skills=hard_skills,
-            soft_skills=soft_skills,
-            company=exp.get("company_or_project", ""),
-            title=exp.get("title", ""),
-            date_range=date_range,
-            bullets="\n".join(exp.get("bullets", [])),
+            jd_summary=jd_summary,
+            story=story,
+            actions=actions,
+            results=results_str,
+            abilities=abilities,
+            flex_keywords=flex_keywords,
         )
         rewrite_response = call_ai(rewrite_prompt, system=REWRITE_SYSTEM)
 
@@ -212,13 +230,16 @@ if st.session_state.match_results:
     st.markdown('<div style="height:1rem;"></div>', unsafe_allow_html=True)
 
     # Score overview bar chart
-    scores_data = {r["experience"].get("title", "?"): r["score"] for r in st.session_state.match_results}
+    scores_data = {
+        r["experience"].get("title", "?"): r["score"]
+        for r in st.session_state.match_results
+    }
     st.bar_chart(scores_data, use_container_width=True, height=140)
 
     for result in st.session_state.match_results:
         _render_match_card(result)
 
-    # Aggregate copy all
+    # Aggregate export
     all_rewritten = "\n\n".join(
         f"【{r['experience'].get('title', '')}】得分：{r['score']}/100\n"
         + "\n".join(f"• {line}" for line in r.get("rewritten", []))
