@@ -231,22 +231,10 @@ GLOBAL_CSS = """
         background: #EDEBE8;
         border-right: 1px solid #E0DDD9;
     }
-    /* Collapsed sidebar strip — always visible + expand button clickable */
-    section[data-testid="stSidebar"][aria-expanded="false"] {
-        min-width: 20px !important;
-    }
-    section[data-testid="stSidebar"] button[data-testid="stSidebarCollapseButton"] {
-        opacity: 1 !important;
-        visibility: visible !important;
-        z-index: 999 !important;
-    }
-    /* Cover any auto-generated class variants of the collapse button */
-    section[data-testid="stSidebar"] button[data-testid="stSidebarCollapseButton"] * {
-        opacity: 1 !important;
-        visibility: visible !important;
-    }
-    section[data-testid="stSidebar"] button[kind="tertiary"] {
-        opacity: 1 !important;
+    /* Ensure sidebar is always visible with a minimum width */
+    section[data-testid="stSidebar"] {
+        min-width: 240px !important;
+        width: 240px !important;
     }
     section[data-testid="stSidebar"] .stMarkdown,
     section[data-testid="stSidebar"] div[data-testid="stMarkdownContainer"] p {
@@ -491,20 +479,6 @@ GLOBAL_CSS = """
     }
     div[data-testid="stDecoration"] {
         display: none;
-    }
-
-    /* Keep header functional — do NOT hide (contains sidebar toggle / hamburger) */
-    header[data-testid="stHeader"] {
-        background: transparent !important;
-        backdrop-filter: none !important;
-    }
-    /* Toolbar: make minimal but keep clickable (hamburger menu for sidebar) */
-    header[data-testid="stHeader"] [data-testid="stToolbar"] {
-        background: transparent !important;
-    }
-    /* Hide the "Running" status pill */
-    header[data-testid="stHeader"] [data-testid="stAppStatus"] {
-        display: none !important;
     }
 </style>
 """

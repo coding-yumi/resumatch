@@ -46,6 +46,23 @@ else:
     )
     st.markdown('<div style="height:1rem;"></div>', unsafe_allow_html=True)
 
+# ── Nav (fallback when sidebar is collapsed) ──────────────────────
+with st.container():
+    st.markdown(
+        '<p style="font-size:0.8rem;font-weight:500;color:#6B6B6B;'
+        'letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.75rem;">'
+        'Navigation</p>',
+        unsafe_allow_html=True,
+    )
+    nav_cols = st.columns(3)
+    with nav_cols[0]:
+        st.page_link("pages/1_经历库.py", label="经历库")
+    with nav_cols[1]:
+        st.page_link("pages/2_JD分析.py", label="JD 分析")
+    with nav_cols[2]:
+        st.page_link("pages/3_匹配结果.py", label="匹配结果")
+    st.markdown('<div style="height:2rem;"></div>', unsafe_allow_html=True)
+
 # ── Steps ─────────────────────────────────────────────────────────
 steps = [
     ("01", "录入经历库", "添加实习与项目经历，沉淀你的求职素材"),
