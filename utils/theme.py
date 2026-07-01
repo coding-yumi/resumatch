@@ -231,12 +231,21 @@ GLOBAL_CSS = """
         background: #EDEBE8;
         border-right: 1px solid #E0DDD9;
     }
-    /* Collapsed sidebar: ensure toggle arrow is always visible */
-    section[data-testid="stSidebar"] [data-testid="stSidebarCollapseButton"] {
+    /* Collapsed sidebar strip — always visible + expand button clickable */
+    section[data-testid="stSidebar"][aria-expanded="false"] {
+        min-width: 20px !important;
+    }
+    section[data-testid="stSidebar"] button[data-testid="stSidebarCollapseButton"] {
+        opacity: 1 !important;
+        visibility: visible !important;
+        z-index: 999 !important;
+    }
+    /* Cover any auto-generated class variants of the collapse button */
+    section[data-testid="stSidebar"] button[data-testid="stSidebarCollapseButton"] * {
         opacity: 1 !important;
         visibility: visible !important;
     }
-    section[data-testid="stSidebar"] .st-emotion-cache-1gwvycy {
+    section[data-testid="stSidebar"] button[kind="tertiary"] {
         opacity: 1 !important;
     }
     section[data-testid="stSidebar"] .stMarkdown,
@@ -484,14 +493,14 @@ GLOBAL_CSS = """
         display: none;
     }
 
-    /* Keep header functional (sidebar toggle) but visually minimal */
+    /* Keep header functional — do NOT hide (contains sidebar toggle / hamburger) */
     header[data-testid="stHeader"] {
         background: transparent !important;
         backdrop-filter: none !important;
     }
-    /* Hide the toolbar container within header */
+    /* Toolbar: make minimal but keep clickable (hamburger menu for sidebar) */
     header[data-testid="stHeader"] [data-testid="stToolbar"] {
-        display: none !important;
+        background: transparent !important;
     }
     /* Hide the "Running" status pill */
     header[data-testid="stHeader"] [data-testid="stAppStatus"] {
