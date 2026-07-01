@@ -64,11 +64,8 @@
 
 | 主页 | Career Asset Library |
 |------|----------------------|
-| <img width="600" alt="home" src="https://github.com/user-attachments/assets/51d03f59-0d91-48a4-bd65-50f91d3ed8d8" /> | *(截图待补充)* |
-
-| JD 分析 | 匹配结果 |
-|---------|----------|
-| *(截图待补充)* | <img width="600" alt="match" src="https://github.com/user-attachments/assets/172185f6-1f9e-421c-8839-0d9ee7b12582" /> |
+| <img width="600" alt="home" src="https://github.com/user-attachments/assets/51d03f59-0d91-48a4-bd65-50f91d3ed8d8" /> |<img width="1260" height="569" alt="image" src="https://github.com/user-attachments/assets/a6f5a405-3b4d-45fa-b514-09650e14281e" />
+|
 
 ---
 
